@@ -25,11 +25,11 @@ var Map = function(latLng, zoom){
 
 var GeoLocator = function(map, countries){
   this.map = map;
-  this.setCenter = function(){
+  this.setCenter = function(map, countries){
     navigator.geolocation.getCurrentPosition(function(response){ 
       var position = {lat: response.coords.latitude, lng: response.coords.longitude}
       this.map.googleMap.panTo(position);
-        
+      geoFind(position, countries, map) 
       
     }.bind(this))
   }
@@ -70,23 +70,29 @@ var main = function (countries) {
 }
 
 
-var find = function(map,countries){
-    var geo = new GeoLocator(map);
-    geo.setCenter(map)
+var find = function(map, countries){
+    var geo = new GeoLocator(map, countries); 
+    geo.setCenter(map, countries)
 }
 
-// var geoFind = function(latLng){
-//     var url = "http://maps.googleapis.com/maps/api/geocode/json?latlng="+latLng.lat+"," +latLng.lng+ "&sensor=false"
-//     var request = new XMLHttpRequest();
-//     request.open("GET", url);
-//     request.onload = function () {
-//         if (request.status === 200) {
-//             var jsonString = request.responseText;
-//             var country = JSON.parse(jsonString);
-//             console.log(country)   
-//         }
-//     }
+// var findCountry = function(map, countries){
+//     console.log(map)
+//     console.log(countries)
 // }
+var geoFind = function(latLng, countries, map){
+    var url = "http://maps.googleapis.com/maps/api/geocode/json?latlng="+latLng.lat+"," +latLng.lng+ "&sensor=false"
+    var request = new XMLHttpRequest();
+    request.open("GET", url);
+    request.onload = function () {
+        if (request.status === 200) {
+            var jsonString = request.responseText;
+            var country = JSON.parse(jsonString);
+            countryFinder(country.results[0].address_components[6].long_name, countries, map)
+        }
+    }
+    request.send();
+
+}
 
 var updateMap = function(selected, map){
     var center = {lat: selected.latlng[0], lng: selected.latlng[1]}
@@ -95,6 +101,15 @@ var updateMap = function(selected, map){
         map.googleMap.panTo(center);
         setTimeout(function(){map.googleMap.setZoom(6);},1000)
     },1000)
+}
+
+
+var countryFinder= function(countryName,countries, map){
+    countries.forEach(function(country){
+      if(country.name === countryName){
+        updateDisplay(country,map);
+      }
+    })
 }
 
 var populateSelect = function (countries, map) {
