@@ -1,0 +1,37 @@
+body{
+
+font-family: "Mononoki", sans-serif;
+text-align: center;
+background-color: wheat;
+background-image: url("http://www.leveledmag.com/wp-content/uploads/2012/07/old-world-map-copy2.jpeg");
+
+}
+
+#map {
+  width: 900px;
+  height:500px;
+  margin:auto;
+  box-shadow: 10px 10px 45px black;
+  border: 2px dashed black;
+  border-top-right-radius: 50%;
+  border-bottom-left-radius: 50%;
+}
+
+#countries{
+  margin:auto;
+  border: 1px solid black;
+  box-shadow: 3px 3px 5px black;
+
+}
+
+#info {
+  background-color: wheat;
+  margin: auto;
+  width: 40%;
+  margin-bottom: 20px;
+  margin-top: 10px;
+  border: 1px solid black;
+  box-shadow: 10px 10px 45px black;
+  border-top-right-radius: 60%;
+  border-bottom-left-radius: 60%;
+}
