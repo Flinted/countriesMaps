@@ -1,3 +1,4 @@
+// Map Constructor: -----------------------------------------------------------------------------
 var Map = function(latLng, zoom){
   this.googleMap = new google.maps.Map(document.getElementById('map'), {
     center: latLng,
@@ -11,18 +12,31 @@ var Map = function(latLng, zoom){
     })
       return marker; 
   } 
-
   this.addInfoWindow= function(latLng, title){
     var marker = this.addMarker(latLng, title);
     marker.addListener('click', function(event){
       var infoWindow = new google.maps.InfoWindow({
         content: this.title
-      })
-      infoWindow.open( this.map, marker ) 
     })
-  }
+      infoWindow.open( this.map, marker ) 
+  })
+
+}
+this.bindClick = function(countries, map){
+
+ google.maps.event.addListener( this.googleMap, 'click', function(event){
+    var latLng = {lat:event.latLng.lat(), lng: event.latLng.lng()}
+    // this.map.googleMap.panTo(latLng);
+    console.log(latLng)
+    console.log(countries)
+    console.log(map)
+    geoFind(latLng, countries, map) 
+}.bind(this))
 }
 
+}
+
+// geolocator constructor:--------------------------------------------------------------------
 var GeoLocator = function(map, countries){
   this.map = map;
   this.setCenter = function(map, countries){
@@ -31,10 +45,11 @@ var GeoLocator = function(map, countries){
       this.map.googleMap.panTo(position);
       geoFind(position, countries, map) 
       
-    }.bind(this))
-  }
-}
+  }.bind(this))
 
+}
+}
+// onload stuff: --------------------------------------------------------------------
 window.onload = function () {
     var url = 'https://restcountries.eu/rest/v1'
     var request = new XMLHttpRequest();
@@ -47,9 +62,11 @@ window.onload = function () {
         }
     }
     request.send();
-
 };
 
+
+
+// main function:--------------------------------------------------------------------
 var main = function (countries) {
 
     var cached = localStorage.getItem("selectedCountry");
@@ -67,6 +84,7 @@ var main = function (countries) {
     button.onclick = function(event){
         find(map, countries);
     }
+    map.bindClick(countries,map);
 }
 
 
@@ -75,10 +93,6 @@ var find = function(map, countries){
     geo.setCenter(map, countries)
 }
 
-// var findCountry = function(map, countries){
-//     console.log(map)
-//     console.log(countries)
-// }
 var geoFind = function(latLng, countries, map){
     var url = "http://maps.googleapis.com/maps/api/geocode/json?latlng="+latLng.lat+"," +latLng.lng+ "&sensor=false"
     var request = new XMLHttpRequest();
@@ -87,11 +101,11 @@ var geoFind = function(latLng, countries, map){
         if (request.status === 200) {
             var jsonString = request.responseText;
             var country = JSON.parse(jsonString);
-            countryFinder(country.results[0].address_components[6].long_name, countries, map)
+            console.log(country)
+            countryFinder(country.results[country.results.length-1].formatted_address, countries, map)
         }
     }
     request.send();
-
 }
 
 var updateMap = function(selected, map){
@@ -108,8 +122,8 @@ var countryFinder= function(countryName,countries, map){
     countries.forEach(function(country){
       if(country.name === countryName){
         updateDisplay(country,map);
-      }
-    })
+    }
+})
 }
 
 var populateSelect = function (countries, map) {
